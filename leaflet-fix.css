@@ -1,0 +1,47 @@
+/* Fix for Leaflet markers in Vite */
+.leaflet-default-icon-path {
+  background-image: url('leaflet/dist/images/marker-icon.png');
+}
+
+/* Priority-based marker styling */
+.priority-urgent-marker {
+  filter: hue-rotate(0deg) saturate(1.5) brightness(0.8);
+}
+
+.priority-high-marker {
+  filter: hue-rotate(30deg) saturate(1.3) brightness(0.9);
+}
+
+.priority-medium-marker {
+  filter: hue-rotate(60deg) saturate(1.1) brightness(1);
+}
+
+.priority-low-marker {
+  filter: hue-rotate(120deg) saturate(1) brightness(1.1);
+}
+
+/* Custom popup styling */
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.leaflet-popup-content {
+  margin: 12px 16px;
+  line-height: 1.4;
+}
+
+/* Map container styling */
+.leaflet-container {
+  font-family: inherit;
+}
+
+/* Ensure proper z-index for map controls */
+.leaflet-control-zoom {
+  z-index: 1000;
+}
+
+.leaflet-control-attribution {
+  background: rgba(255, 255, 255, 0.8);
+  font-size: 11px;
+}
