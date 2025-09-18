@@ -17,6 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useBackend } from '../../contexts/AuthContext';
 import { DashboardStats, Issue, mockUsers } from '@/lib/mockData';
+import IssueTable from '@/components/IssueTable';
 
 export default function SuperAdminOverview() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -55,15 +56,15 @@ export default function SuperAdminOverview() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-primary-800">Super Admin Dashboard</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-primary-800">Super Admin Dashboard</h1>
           <p className="text-primary-600">Global overview of all city operations</p>
         </div>
         <Button
           onClick={() => setShowMap(!showMap)}
           variant="outline"
-          className="border-primary-300 text-primary-700 hover:bg-primary-50"
+          className="border-primary-300 text-primary-700 hover:bg-primary-50 w-full sm:w-auto"
         >
           <MapPin className="h-4 w-4 mr-2" />
           {showMap ? 'Hide Map' : 'Show Map'}
@@ -71,70 +72,90 @@ export default function SuperAdminOverview() {
       </div>
 
       {/* Primary Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         <DashboardCard
           title="Total Issues"
           value={stats?.totalIssues || 0}
-          icon={<AlertTriangle className="h-4 w-4 text-orange-600" />}
+          icon={<AlertTriangle className="h-5 w-5 text-orange-600" />}
           description="All reported issues citywide"
+          size="md"
+          variant="minimal"
         />
         <DashboardCard
           title="Open Issues"
           value={stats?.openIssues || 0}
-          icon={<Clock className="h-4 w-4 text-blue-600" />}
+          icon={<Clock className="h-5 w-5 text-blue-600" />}
           description="Pending resolution"
+          size="md"
+          variant="minimal"
         />
         <DashboardCard
           title="Resolved Today"
           value={stats?.resolvedIssues || 0}
-          icon={<CheckCircle className="h-4 w-4 text-green-600" />}
+          icon={<CheckCircle className="h-5 w-5 text-green-600" />}
           description="Successfully completed"
+          size="md"
+          variant="minimal"
         />
         <DashboardCard
           title="SLA Compliance"
           value={`${stats?.slaCompliance || 0}%`}
-          icon={<TrendingUp className="h-4 w-4 text-purple-600" />}
+          icon={<TrendingUp className="h-5 w-5 text-purple-600" />}
           description="On-time resolution rate"
+          size="md"
+          variant="minimal"
         />
       </div>
 
       {/* Super Admin Advanced Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
         <DashboardCard
           title="Active Users"
           value={mockUsers.filter(u => u.isActive).length}
           icon={<Users className="h-4 w-4 text-blue-500" />}
           description="System users online"
+          size="sm"
+          variant="minimal"
         />
         <DashboardCard
           title="Departments"
           value={Object.keys(stats?.departmentStats || {}).length}
           icon={<Users className="h-4 w-4 text-purple-500" />}
           description="Active departments"
+          size="sm"
+          variant="minimal"
         />
         <DashboardCard
           title="Urgent Issues"
           value={issues.filter(i => i.priority === 'urgent').length}
           icon={<AlertTriangle className="h-4 w-4 text-red-500" />}
           description="Require immediate attention"
+          size="sm"
+          variant="minimal"
         />
         <DashboardCard
           title="Overdue"
           value={issues.filter(i => i.dueDate && new Date(i.dueDate) < new Date() && i.status !== 'resolved').length}
           icon={<Clock className="h-4 w-4 text-orange-500" />}
           description="Past due date"
+          size="sm"
+          variant="minimal"
         />
         <DashboardCard
           title="Avg Response"
           value="2.4h"
           icon={<TrendingUp className="h-4 w-4 text-green-500" />}
           description="Average response time"
+          size="sm"
+          variant="minimal"
         />
         <DashboardCard
           title="Satisfaction"
           value="94%"
           icon={<CheckCircle className="h-4 w-4 text-blue-500" />}
           description="Citizen satisfaction rate"
+          size="sm"
+          variant="minimal"
         />
       </div>
 
@@ -144,7 +165,7 @@ export default function SuperAdminOverview() {
           <CardTitle className="text-primary-800">Department Performance</CardTitle>
         </CardHeader>
         <CardContent className="bg-white">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {Object.entries(stats?.departmentStats || {}).map(([deptId, dept]) => (
               <div key={deptId} className="p-4 border rounded-lg bg-neutral-50">
                 <h4 className="font-semibold text-primary-800">{dept.name}</h4>
@@ -171,10 +192,10 @@ export default function SuperAdminOverview() {
       </Card>
 
       {/* System Health & Analytics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
         <Card className="border-primary-200 shadow-lg">
-          <CardHeader className="bg-primary">
-            <CardTitle className="text-primary-800 flex items-center gap-2">
+          <CardHeader>
+            <CardTitle className="text-primary flex items-center gap-2">
               <Activity className="h-5 w-5" />
               System Health
             </CardTitle>
@@ -206,8 +227,8 @@ export default function SuperAdminOverview() {
         </Card>
 
         <Card className="border-primary-200 shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-primary-50 to-secondary-50">
-            <CardTitle className="text-primary-800 flex items-center gap-2">
+          <CardHeader>
+            <CardTitle className="text-primary flex items-center gap-2">
               <BarChart3 className="h-5 w-5" />
               System Analytics
             </CardTitle>
@@ -241,19 +262,19 @@ export default function SuperAdminOverview() {
         />
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2 border-primary shadow-lg">
-          <CardHeader className="bg-primary">
-            <CardTitle className="text-secondary">Recent Issues</CardTitle>
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 md:gap-6">
+        <Card className="xl:col-span-2 border-primary shadow-lg">
+          <CardHeader>
+            <CardTitle className="text-primary">Recent Issues</CardTitle>
           </CardHeader>
           <CardContent className="bg-white">
-            <EnhancedIssueTable showFilters={false} />
+            <IssueTable showFilters={false} />
           </CardContent>
         </Card>
 
         <Card className="border-primary shadow-lg">
-          <CardHeader className="bg-primary">
-            <CardTitle className="text-secondary">Recent Activity</CardTitle>
+          <CardHeader className="">
+            <CardTitle className="text-primary">Recent Activity</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 bg-white">
             {stats?.recentActivity?.map((activity) => (

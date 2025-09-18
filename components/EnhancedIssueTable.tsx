@@ -143,39 +143,6 @@ export default function EnhancedIssueTable({
     }
   };
 
-  const getPriorityBadgeVariant = (priority: string) => {
-    switch (priority) {
-      case 'urgent': return 'destructive';
-      case 'high': return 'destructive';
-      case 'medium': return 'default';
-      case 'low': return 'secondary';
-      default: return 'default';
-    }
-  };
-
-  const getStatusBadgeVariant = (status: string) => {
-    switch (status) {
-      case 'resolved': return 'default';
-      case 'in_progress': return 'default';
-      case 'closed': return 'secondary';
-      case 'paused': return 'outline';
-      case 'escalated': return 'destructive';
-      case 'open': return 'destructive';
-      default: return 'secondary';
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'resolved': return 'text-green-600';
-      case 'in_progress': return 'text-blue-600';
-      case 'closed': return 'text-gray-600';
-      case 'paused': return 'text-yellow-600';
-      case 'escalated': return 'text-red-600';
-      case 'open': return 'text-orange-600';
-      default: return 'text-gray-600';
-    }
-  };
 
   if (loading) {
     return (
@@ -232,156 +199,132 @@ export default function EnhancedIssueTable({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Issue</TableHead>
-              <TableHead>Priority</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Assigned To</TableHead>
-              <TableHead>Reported</TableHead>
-              <TableHead>Location</TableHead>
-              <TableHead>Due Date</TableHead>
-              {showActions && <TableHead>Actions</TableHead>}
+              <TableHead className="w-[35%] text-left">Issue</TableHead>
+              <TableHead className="w-[8%] text-center">Priority</TableHead>
+              <TableHead className="w-[10%] text-center">Status</TableHead>
+              <TableHead className="w-[20%] text-left">Location</TableHead>
+              <TableHead className="w-[12%] text-center">Reported</TableHead>
+              {showActions && <TableHead className="w-[15%] text-center">Actions</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
             {issues.map((issue) => (
               <TableRow key={issue.id}>
-                <TableCell>
+                <TableCell className="text-left">
                   <div>
-                    <div className="font-medium">{issue.title}</div>
-                    <div className="text-sm text-muted-foreground truncate max-w-xs">
+                    <div className="font-medium text-sm">{issue.title}</div>
+                    <div className="text-xs text-muted-foreground truncate">
                       {issue.description}
                     </div>
                     {issue.tags && issue.tags.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-1">
-                        {issue.tags.slice(0, 2).map(tag => (
-                          <Badge key={tag} variant="outline" className="text-xs">
+                        {issue.tags.slice(0, 3).map(tag => (
+                          <Badge key={tag} variant="outline" className="text-xs px-1 py-0">
                             {tag}
                           </Badge>
                         ))}
-                        {issue.tags.length > 2 && (
-                          <Badge variant="outline" className="text-xs">
-                            +{issue.tags.length - 2}
+                        {issue.tags.length > 3 && (
+                          <Badge variant="outline" className="text-xs px-1 py-0">
+                            +{issue.tags.length - 3}
                           </Badge>
                         )}
                       </div>
                     )}
                   </div>
                 </TableCell>
-                <TableCell>
-                  <Badge variant={getPriorityBadgeVariant(issue.priority)}>
+                <TableCell className="text-center">
+                  <div className={`text-xs font-medium ${
+                    issue.priority === 'urgent' ? 'text-red-600' :
+                    issue.priority === 'high' ? 'text-orange-600' :
+                    issue.priority === 'medium' ? 'text-yellow-600' :
+                    'text-green-600'
+                  }`}>
                     {issue.priority}
-                  </Badge>
+                  </div>
                 </TableCell>
-                <TableCell>
-                  <Badge variant={getStatusBadgeVariant(issue.status)} className={getStatusColor(issue.status)}>
+                <TableCell className="text-center">
+                  <div className={`text-xs font-medium ${
+                    issue.status === 'resolved' ? 'text-green-600' :
+                    issue.status === 'in_progress' ? 'text-blue-600' :
+                    issue.status === 'closed' ? 'text-gray-600' :
+                    issue.status === 'paused' ? 'text-amber-600' :
+                    issue.status === 'escalated' ? 'text-red-600' :
+                    'text-orange-600'
+                  }`}>
                     {issue.status.replace('_', ' ')}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <div>
-                    <div>{issue.assignedTo || 'Unassigned'}</div>
-                    {issue.assignedTeam && issue.assignedTeam.length > 0 && (
-                      <div className="text-xs text-muted-foreground">
-                        Team: {issue.assignedTeam.length} members
-                      </div>
-                    )}
                   </div>
                 </TableCell>
-                <TableCell>
-                  <div className="flex items-center space-x-1">
-                    <Clock className="h-3 w-3 text-muted-foreground" />
-                    <span className="text-sm">
-                      {new Date(issue.reportedAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center space-x-1">
-                    <MapPin className="h-3 w-3 text-muted-foreground" />
-                    <span className="text-sm truncate max-w-32">
+                <TableCell className="text-left">
+                  <div className="flex items-start space-x-1">
+                    <MapPin className="h-3 w-3 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <span className="text-xs text-muted-foreground break-words">
                       {issue.address}
                     </span>
                   </div>
                 </TableCell>
-                <TableCell>
-                  <div className="text-sm">
-                    {issue.dueDate ? new Date(issue.dueDate).toLocaleDateString() : 'Not set'}
+                <TableCell className="text-center">
+                  <div className="text-xs">
+                    {new Date(issue.reportedAt).toLocaleDateString()}
                   </div>
                 </TableCell>
                 {showActions && (
-                  <TableCell>
-                    <div className="flex items-center space-x-2">
-                      {/* Quick actions based on status */}
-                      {issue.status === 'open' && (
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => handleQuickAction(issue, 'start')}
-                          className="h-8 w-8 p-0"
-                          title="Start Work"
-                        >
-                          <Play className="h-3 w-3" />
+                  <TableCell className="text-center">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          <MoreHorizontal className="h-4 w-4" />
                         </Button>
-                      )}
-                      
-                      {issue.status === 'in_progress' && (
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => handleQuickAction(issue, 'complete')}
-                          className="h-8 w-8 p-0"
-                          title="Mark Complete"
-                        >
-                          <CheckCircle className="h-3 w-3" />
-                        </Button>
-                      )}
-
-                      {/* More actions dropdown */}
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem onClick={() => handleAction(issue, 'assign')}>
-                            <UserPlus className="mr-2 h-4 w-4" />
-                            Assign
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        {issue.status === 'open' && (
+                          <DropdownMenuItem onClick={() => handleQuickAction(issue, 'start')}>
+                            <Play className="mr-2 h-4 w-4" />
+                            Start Work
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleAction(issue, 'team_assign')}>
-                            <Users className="mr-2 h-4 w-4" />
-                            Assign Team
+                        )}
+                        {issue.status === 'in_progress' && (
+                          <DropdownMenuItem onClick={() => handleQuickAction(issue, 'complete')}>
+                            <CheckCircle className="mr-2 h-4 w-4" />
+                            Mark Complete
                           </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={() => handleAction(issue, 'edit')}>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit
+                        )}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => handleAction(issue, 'assign')}>
+                          <UserPlus className="mr-2 h-4 w-4" />
+                          Assign
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleAction(issue, 'team_assign')}>
+                          <Users className="mr-2 h-4 w-4" />
+                          Assign Team
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => handleAction(issue, 'edit')}>
+                          <Edit className="mr-2 h-4 w-4" />
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleAction(issue, 'take_action')}>
+                          <Eye className="mr-2 h-4 w-4" />
+                          Take Action
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        {issue.status !== 'paused' && (
+                          <DropdownMenuItem onClick={() => handleAction(issue, 'pause')}>
+                            <Pause className="mr-2 h-4 w-4" />
+                            Pause
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleAction(issue, 'take_action')}>
-                            <Eye className="mr-2 h-4 w-4" />
-                            Take Action
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          {issue.status !== 'paused' && (
-                            <DropdownMenuItem onClick={() => handleAction(issue, 'pause')}>
-                              <Pause className="mr-2 h-4 w-4" />
-                              Pause
-                            </DropdownMenuItem>
-                          )}
-                          <DropdownMenuItem onClick={() => handleAction(issue, 'rollback')}>
-                            <Undo className="mr-2 h-4 w-4" />
-                            Rollback
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={() => handleAction(issue, 'support_request')}>
-                            <MessageCircle className="mr-2 h-4 w-4" />
-                            Request Support
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
+                        )}
+                        <DropdownMenuItem onClick={() => handleAction(issue, 'rollback')}>
+                          <Undo className="mr-2 h-4 w-4" />
+                          Rollback
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => handleAction(issue, 'support_request')}>
+                          <MessageCircle className="mr-2 h-4 w-4" />
+                          Request Support
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 )}
               </TableRow>

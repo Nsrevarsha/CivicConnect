@@ -119,14 +119,13 @@ export default function IssueTable({ showFilters = true, showActions = true }: I
               <TableHead>Issue</TableHead>
               <TableHead>Priority</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Assigned To</TableHead>
               <TableHead>Reported</TableHead>
-              <TableHead>Location</TableHead>
-              {showActions && <TableHead>Actions</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
-            {issues.map((issue) => (
+            {issues
+              .filter(issue => new Date(issue.reportedAt).getTime() > Date.now() - 24 * 60 * 60 * 1000)
+              .map((issue) => (
               <TableRow key={issue.id}>
                 <TableCell>
                   <div>
@@ -136,18 +135,27 @@ export default function IssueTable({ showFilters = true, showActions = true }: I
                     </div>
                   </div>
                 </TableCell>
-                <TableCell>
-                  <Badge variant={getPriorityBadgeVariant(issue.priority)}>
+                <TableCell className="text-center">
+                  <div className={`text-xs font-medium ${
+                    issue.priority === 'urgent' ? 'text-red-600' :
+                    issue.priority === 'high' ? 'text-orange-600' :
+                    issue.priority === 'medium' ? 'text-yellow-600' :
+                    'text-green-600'
+                  }`}>
                     {issue.priority}
-                  </Badge>
+                  </div>
                 </TableCell>
-                <TableCell>
-                  <Badge variant={getStatusBadgeVariant(issue.status)}>
+                <TableCell className="text-center">
+                  <div className={`text-xs font-medium ${
+                    issue.status === 'resolved' ? 'text-green-600' :
+                    issue.status === 'in_progress' ? 'text-blue-600' :
+                    issue.status === 'closed' ? 'text-gray-600' :
+                    issue.status === 'paused' ? 'text-amber-600' :
+                    issue.status === 'escalated' ? 'text-red-600' :
+                    'text-orange-600'
+                  }`}>
                     {issue.status.replace('_', ' ')}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  {issue.assignedTo || 'Unassigned'}
+                  </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center space-x-1">
@@ -155,31 +163,19 @@ export default function IssueTable({ showFilters = true, showActions = true }: I
                     <span className="text-sm">
                       {new Date(issue.reportedAt).toLocaleDateString()}
                     </span>
+                    <Badge variant="secondary" className="text-xs">
+                      Recent
+                    </Badge>
                   </div>
                 </TableCell>
-                <TableCell>
-                  <div className="flex items-center space-x-1">
-                    <MapPin className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm truncate max-w-32">
-                      {issue.address}
-                    </span>
-                  </div>
-                </TableCell>
-                {showActions && (
-                  <TableCell>
-                    <Button variant="ghost" size="sm">
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                )}
               </TableRow>
             ))}
           </TableBody>
         </Table>
         
-        {issues.length === 0 && (
+        {issues.filter(issue => new Date(issue.reportedAt).getTime() > Date.now() - 24 * 60 * 60 * 1000).length === 0 && (
           <div className="text-center py-8 text-muted-foreground">
-            No issues found
+            No recent issues found
           </div>
         )}
       </div>
