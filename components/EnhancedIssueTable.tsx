@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -48,12 +48,14 @@ interface EnhancedIssueTableProps {
   showFilters?: boolean;
   showActions?: boolean;
   onIssueUpdate?: (issue: Issue) => void;
+  searchTerm?: string;
 }
 
 export default function EnhancedIssueTable({ 
   showFilters = true, 
   showActions = true,
-  onIssueUpdate
+  onIssueUpdate,
+  searchTerm = ''
 }: EnhancedIssueTableProps) {
   const [issues, setIssues] = useState<Issue[]>([]);
   const [loading, setLoading] = useState(true);
@@ -90,6 +92,41 @@ export default function EnhancedIssueTable({
       setLoading(false);
     }
   };
+
+  // Filter issues based on search term
+  const filteredIssues = useMemo(() => {
+    console.log('EnhancedIssueTable - Search term:', searchTerm);
+    console.log('EnhancedIssueTable - Total issues:', issues.length);
+    
+    if (!searchTerm.trim()) {
+      console.log('No search term, returning all issues');
+      return issues;
+    }
+
+    const searchLower = searchTerm.toLowerCase().trim();
+    const filtered = issues.filter(issue => {
+      // Search in title, description, address, and tags
+      const titleMatch = issue.title.toLowerCase().includes(searchLower);
+      const descriptionMatch = issue.description.toLowerCase().includes(searchLower);
+      const addressMatch = issue.address.toLowerCase().includes(searchLower);
+      const statusMatch = issue.status.toLowerCase().includes(searchLower);
+      const priorityMatch = issue.priority.toLowerCase().includes(searchLower);
+      const tagsMatch = issue.tags?.some(tag => 
+        tag.toLowerCase().includes(searchLower)
+      ) || false;
+
+      const matches = titleMatch || descriptionMatch || addressMatch || statusMatch || priorityMatch || tagsMatch;
+      
+      if (matches) {
+        console.log('Issue matches:', issue.title);
+      }
+      
+      return matches;
+    });
+    
+    console.log('Filtered results:', filtered.length);
+    return filtered;
+  }, [issues, searchTerm]);
 
   const handleAction = (issue: Issue, actionType: typeof modalType) => {
     console.log('handleAction called', { issue: issue.id, actionType });
@@ -143,7 +180,6 @@ export default function EnhancedIssueTable({
     }
   };
 
-
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -194,6 +230,7 @@ export default function EnhancedIssueTable({
           </Button>
         </div>
       )}
+
       
       <div className="border rounded-lg overflow-hidden">
         <Table>
@@ -208,7 +245,7 @@ export default function EnhancedIssueTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {issues.map((issue) => (
+            {filteredIssues.map((issue) => (
               <TableRow key={issue.id}>
                 <TableCell className="text-left">
                   <div>
@@ -332,7 +369,13 @@ export default function EnhancedIssueTable({
           </TableBody>
         </Table>
         
-        {issues.length === 0 && (
+        {filteredIssues.length === 0 && searchTerm.trim() && (
+          <div className="text-center py-8 text-muted-foreground">
+            No issues found matching "{searchTerm}"
+          </div>
+        )}
+        
+        {filteredIssues.length === 0 && !searchTerm.trim() && (
           <div className="text-center py-8 text-muted-foreground">
             No issues found
           </div>
