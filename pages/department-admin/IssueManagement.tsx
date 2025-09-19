@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import IssueTable from '../../components/IssueTable';
+import EnhancedIssueTable from '../../components/EnhancedIssueTable';
 
 export default function IssueManagement() {
   return (
@@ -14,7 +14,7 @@ export default function IssueManagement() {
           <CardTitle>Department Issues</CardTitle>
         </CardHeader>
         <CardContent>
-          <IssueTable />
+          <EnhancedIssueTable />
         </CardContent>
       </Card>
     </div>
